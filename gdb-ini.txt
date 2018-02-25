@@ -1,0 +1,104 @@
+set disassembly-flavor intel
+display/8i $pc
+
+define mdump
+	set $mdump_cur_p=$arg0
+	set $mdump_n_p=0
+	set $mdump_max=$arg1
+	while $mdump_n_p++ < $mdump_max
+		set $mdump_line_p = 0
+		printf "0x%08x:",$mdump_cur_p
+		while $mdump_line_p++ < 16
+			printf " %02X",*(unsigned char*)$mdump_cur_p++
+		end
+		printf "\n"
+	end
+end
+
+define mdump_ascii
+	set $mdump_cur_p=$arg0
+	set $mdump_n_p=0
+	set $mdump_max=$arg1
+	while $mdump_n_p++ < $mdump_max
+		set $mdump_line_p = 0
+		printf "%08Xh:",$mdump_cur_p
+		while $mdump_line_p++ < 16
+			printf " %02X",*(unsigned char*)$mdump_cur_p++
+		end
+		printf "\t"
+		set $mdump_cur_p=$mdump_cur_p-16
+		set $mdump_str_p=0
+		while $mdump_str_p++ < 16
+			printf "%c", *(char*)$mdump_cur_p++
+		end
+		printf "\n"
+	end
+end
+
+define mstack_dump
+	set $mstack_count = 0
+	set $mstack_cur_p = $sp
+	while $mstack_count++ < $arg0
+		set $mstack_n_p=0
+		printf "0x%08x:",$mstack_cur_p
+		while $mstack_n_p++ < 4
+			printf " %02X",*(unsigned char*)$mstack_cur_p++
+		end
+		printf "\n"
+	end
+end
+
+define mstack_dump_ascii
+	set $mstack_count = 0
+	set $mstack_cur_p = $sp
+	while $mstack_count++ < $arg0
+		set $mstack_n_p=0
+		printf "0x%08x:",$mstack_cur_p
+		while $mstack_n_p++ < 4
+			printf " %02X",*(unsigned char*)$mstack_cur_p++
+		end
+		printf "\t"
+		set $mstack_cur_p=$mstack_cur_p-4
+		set $mstack_str_p=0
+		while $mstack_str_p++ < 4
+			printf "%c", *(char*)$mstack_cur_p++
+		end
+		printf "\n"
+	end
+end
+
+define mstack_dump_ptr
+	set $mstack_count = 0
+	set $mstack_cur_p = $sp
+	while $mstack_count++ < $arg0
+		set $mstack_n_p=0
+		printf "0x%08x:",$mstack_cur_p
+		while $mstack_n_p++ < 4
+			printf " %02X",*(unsigned char*)$mstack_cur_p++
+		end
+		printf "\t"
+		set $mstack_cur_p=$mstack_cur_p-4
+		x/s *(unsigned int*) $mstack_cur_p
+		set $mstack_cur_p=$mstack_cur_p+4
+		printf "\n"
+	end
+end
+
+define mreg_ptr
+	printf "EAX: "
+	x/s $eax
+	printf "ECX: "
+	x/s $ecx
+	printf "EDX: "
+	x/s $edx
+	printf "EBX: "
+	x/s $ebx
+	printf "ESP: "
+	x/s $esp
+	printf "EBP: "
+	x/s $ebp
+	printf "ESI: "
+	x/s $esi
+	printf "EDI: "
+	x/s $edi	
+end
